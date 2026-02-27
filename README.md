@@ -60,6 +60,8 @@ Install the required Python modules using `pip` with the included `requirements.
 
 If you wish to be able to run tests (useful mainly for Korp developers), install from `requirements-dev.txt` instead of `requirements.txt`.
 
+For production deployments, install from `requirements-prod.txt` to include Gunicorn.
+
 
 ## Configuring Korp
 
@@ -104,7 +106,7 @@ During development or while testing your configuration, use the flag `dev` for a
 
 For deployment, [Gunicorn](http://gunicorn.org/) works well.
 
-    gunicorn --worker-class gevent --bind 0.0.0.0:1234 --workers 4 --max-requests 250 --limit-request-line 0 'run:create_app()'
+  gunicorn --worker-class gevent --bind 0.0.0.0:1234 --workers 4 --max-requests 250 --limit-request-line 0 'korp:create_app()'
 
 
 ## Cache management

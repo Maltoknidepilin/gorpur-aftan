@@ -1,11 +1,14 @@
 import os
+import sys
+
 # Patch standard library to cooperate with gevent (https://www.gevent.org/api/gevent.monkey.html)
 # Skip patching if run through gunicorn (which does the patching for us)
-if "gunicorn" not in os.environ.get("SERVER_SOFTWARE", ""):
+
+if len(sys.argv) == 2 and sys.argv[1] == "dev":
+    print("Running in dev mode - skipping gevent patching")
+elif "gunicorn" not in os.environ.get("SERVER_SOFTWARE", ""):
     from gevent import monkey
     monkey.patch_all()  # Patching needs to be done as early as possible, before other imports
-
-import sys
 
 from gevent.pywsgi import WSGIServer
 
