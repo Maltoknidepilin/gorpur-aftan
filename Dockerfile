@@ -43,6 +43,8 @@ RUN python3 -m venv /opt/gorpur-aftan-venv && \
     rm -rf /var/lib/apt/lists/* /root/.cache /tmp/*
 
 COPY gorpur-aftan/ /opt/gorpur-aftan
+COPY gorps-stillingar-aftan/ /opt/gorps-stillingar-aftan/
+COPY corpora/ /corpora/
 
 RUN groupadd --system gorpur && \
     useradd --system --gid gorpur --home /opt/gorpur-aftan --shell /usr/sbin/nologin gorpur && \
