@@ -1,13 +1,17 @@
 # CWB source inputs for Docker build
 
-The backend Dockerfiles (`Dockerfile` and `Dockerfile.prod`) compile CWB from MMG source folders using the same flags/steps as the previous MMG setup.
+The backend Dockerfiles (`Dockerfile` and `Dockerfile.prod`) compile CWB from
+the `MMG/corpus_workbench` folder using the same flags and steps as the previous
+MMG setup.
 
 Current source paths (relative to workspace root):
 
-- `MMG/docker/korp-docker/cwb-3.5.0-src/`
-- `MMG/docker/korp-docker/cwb-code-r1901-perl-trunk-CWB/`
+- `MMG/corpus_workbench/cwb-3.5.0-src/`
+- `MMG/corpus_workbench/cwb-code-r1901-perl-trunk-CWB/`
 
-Note: backend image builds use workspace-root Docker build context so these paths are available during `COPY`.
+Backend image builds must use the workspace root as their Docker build context
+so these paths are available during `COPY`. The deployment Compose files are
+already configured this way.
 
 ## Recommended version policy
 

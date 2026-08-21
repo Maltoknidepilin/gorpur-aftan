@@ -16,8 +16,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     locale-gen en_US.UTF-8 && update-locale LANG=C.UTF-8 && \
     rm -rf /var/lib/apt/lists/*
 
-COPY MMG/docker/korp-docker/cwb-3.5.0-src /tmp/cwb-3.5.0-src/
-COPY MMG/docker/korp-docker/cwb-code-r1901-perl-trunk-CWB /tmp/cwb-perl
+COPY MMG/corpus_workbench/cwb-3.5.0-src /tmp/cwb-3.5.0-src/
+COPY MMG/corpus_workbench/cwb-code-r1901-perl-trunk-CWB /tmp/cwb-perl
 
 WORKDIR /tmp/cwb-3.5.0-src
 RUN export CFLAGS="-O2 -Wall -fPIC" CXXFLAGS="$CFLAGS" && \

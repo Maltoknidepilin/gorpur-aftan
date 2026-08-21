@@ -1,0 +1,50 @@
+# Exclude the entire workspace by default. Test and production builds only
+# need the backend source and the CWB sources listed below.
+*
+
+# Backend application
+!gorpur-aftan/
+!gorpur-aftan/**
+
+# Keep local configuration, credentials, data, caches and development files
+# out of the image even though the backend directory is included above.
+gorpur-aftan/.git
+gorpur-aftan/.gitignore
+gorpur-aftan/__pycache__/
+gorpur-aftan/**/*.pyc
+gorpur-aftan/**/*.pyo
+gorpur-aftan/.pytest_cache/
+gorpur-aftan/.mypy_cache/
+gorpur-aftan/.venv/
+gorpur-aftan/venv/
+gorpur-aftan/instance/
+gorpur-aftan/instance.example/
+gorpur-aftan/.env
+gorpur-aftan/.env.*
+gorpur-aftan/*.env
+gorpur-aftan/secrets/
+gorpur-aftan/private/
+gorpur-aftan/credentials/
+gorpur-aftan/*.pem
+gorpur-aftan/*.key
+gorpur-aftan/*.crt
+gorpur-aftan/*.p12
+gorpur-aftan/*.pfx
+gorpur-aftan/*.sql
+gorpur-aftan/*.sqlite
+gorpur-aftan/*.sqlite3
+gorpur-aftan/*.db
+gorpur-aftan/dump/
+gorpur-aftan/exports/
+gorpur-aftan/tmp/
+gorpur-aftan/logs/
+gorpur-aftan/tests/
+gorpur-aftan/docs/
+
+# Corpus Workbench core and Perl sources compiled into the backend image
+!MMG/
+!MMG/corpus_workbench/
+!MMG/corpus_workbench/cwb-3.5.0-src/
+!MMG/corpus_workbench/cwb-3.5.0-src/**
+!MMG/corpus_workbench/cwb-code-r1901-perl-trunk-CWB/
+!MMG/corpus_workbench/cwb-code-r1901-perl-trunk-CWB/**
