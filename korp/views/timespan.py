@@ -25,6 +25,7 @@ def timespan(args, no_combined_cache=False):
     utils.assert_key("combined", args, r"(true|false)")
     utils.assert_key("per_corpus", args, r"(true|false)")
     utils.assert_key("strategy", args, r"^[123]$")
+    utils.assert_key("spread_corpora", args, utils.IS_IDENT)
     utils.assert_key("from", args, r"^(\d{8}\d{6}?|\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?)$")
     utils.assert_key("to", args, r"^(\d{8}\d{6}?|\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?)$")
 
@@ -35,6 +36,9 @@ def timespan(args, no_combined_cache=False):
     combined = utils.parse_bool(args, "combined", True)
     per_corpus = utils.parse_bool(args, "per_corpus", True)
     strategy = int(args.get("strategy") or 1)
+    spread_corpora = utils.parse_corpora({"corpus": args.get("spread_corpora", [])})
+    if spread_corpora and granularity != "y":
+        raise ValueError("spread_corpora requires granularity=y.")
     fromdate = args.get("from")
     todate = args.get("to")
 
@@ -52,6 +56,8 @@ def timespan(args, no_combined_cache=False):
         combined_checksum = utils.get_hash((granularity,
                                            combined,
                                            per_corpus,
+                                           strategy,
+                                           spread_corpora,
                                            fromdate,
                                            todate,
                                            sorted(corpora)))
@@ -144,7 +150,8 @@ def timespan(args, no_combined_cache=False):
                 save_cache(mc, corpus, corpus_data)
 
     ns["result"] = timespan_calculator(itertools.chain(cached_data, cursor), granularity=granularity,
-                                       combined=combined, per_corpus=per_corpus, strategy=strategy)
+                                       combined=combined, per_corpus=per_corpus, strategy=strategy,
+                                       spread_corpora=spread_corpora)
 
     if corpora_rest:
         cursor.close()
@@ -160,7 +167,7 @@ def timespan(args, no_combined_cache=False):
     yield ns["result"]
 
 
-def timespan_calculator(timedata, granularity="y", combined=True, per_corpus=True, strategy=1):
+def timespan_calculator(timedata, granularity="y", combined=True, per_corpus=True, strategy=1, spread_corpora=()):
     """Calculate timespan information for corpora.
 
     The required parameters are
@@ -173,7 +180,15 @@ def timespan_calculator(timedata, granularity="y", combined=True, per_corpus=Tru
        (default: true)
      - per_corpus: include results per corpus
        (default: true)
+     - spread_corpora: corpus IDs whose interval tokens should be divided evenly
+       across the included years (granularity=y only). Intended for manually
+       estimated periods. Other corpora and undated tokens are unchanged.
+       (default: empty)
     """
+
+    if spread_corpora and granularity != "y":
+        raise ValueError("spread_corpora requires granularity=y.")
+    spread_corpora = set(spread_corpora)
 
     gs = {"y": 4, "m": 6, "d": 8, "h": 10, "n": 12, "s": 14}
 
@@ -226,6 +241,10 @@ def timespan_calculator(timedata, granularity="y", combined=True, per_corpus=Tru
         datefrom_short = shorten(datefrom, granularity) if datefrom else 0
         dateto_short = shorten(dateto, granularity) if dateto else 0
 
+        if corpus in spread_corpora and (not datefrom_short or not dateto_short or datefrom_short > dateto_short):
+            # Without a bounded interval, keep these tokens in the undated bucket.
+            datefrom_short = dateto_short = 0
+
         if strategy == 1:
             # Some overlaps permitted
             # (t1 >= t1' AND t2 <= t2') OR (t1 <= t1' AND t2 >= t2')
@@ -252,7 +271,11 @@ def timespan_calculator(timedata, granularity="y", combined=True, per_corpus=Tru
             if not datefrom_short == dateto_short:
                 continue
 
-        r = {"datefrom": datefrom_short, "dateto": dateto_short, "corpus": corpus, "freq": int(row["sum"])}
+        freq = int(row["sum"])
+        if corpus in spread_corpora and datefrom_short and dateto_short:
+            freq /= dateto_short - datefrom_short + 1
+
+        r = {"datefrom": datefrom_short, "dateto": dateto_short, "corpus": corpus, "freq": freq}
         if combined:
             rows["__combined__"].append(r)
             nodes["__combined__"].add(("f", datefrom_short))

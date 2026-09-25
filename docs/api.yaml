@@ -668,6 +668,16 @@ paths:
             type: integer
             enum: [1, 2, 3]
             default: 1
+        - name: spread_corpora
+          description: >-
+            Comma-separated corpus IDs with manually estimated periods. Only for
+            these corpora, divide each interval's tokens evenly across the included
+            years. Requires granularity=y. Other corpora, single-year counts and
+            undated counts are unchanged. Results may be fractional. Omit to retain
+            the original overlap counts for all corpora.
+          in: query
+          schema:
+            type: string
         - name: per_corpus
           description: Include per-corpus results.
           schema:
@@ -696,7 +706,7 @@ paths:
                       description: Number of tokens per time period.
                       type: object
                       additionalProperties:
-                        type: integer
+                        type: number
                     example:
                       ROMI:
                         2017: 15366
@@ -705,7 +715,7 @@ paths:
                     type: object
                     description: Number of tokens per time period.
                     additionalProperties:
-                      type: integer
+                      type: number
                     example:
                       2017: 15366
                       2018: 7437
